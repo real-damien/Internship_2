@@ -9,6 +9,8 @@ services:
       - REACT_APP_API_URL=${REACT_APP_API_URL}
     depends_on:
       - backend
+    networks:
+      - app-network
 
   backend:
     build: ./backend
@@ -24,7 +26,9 @@ services:
     depends_on:
       - db
       - rabbitmq
-
+    networks:
+      - app-network
+      
   pinger:
     build: ./pinger
     environment:
@@ -33,7 +37,9 @@ services:
     depends_on:
       - rabbitmq
       - backend
-
+    networks:
+      - app-network
+      
   db:
     image: postgres:17
     environment:
@@ -42,7 +48,9 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
+    networks:
+      - app-network
+      
   rabbitmq:
     image: rabbitmq:4.0.5-management-alpine 
     ports:
@@ -51,6 +59,12 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
+
+networks:
+  app-network:
+    driver: bridge
